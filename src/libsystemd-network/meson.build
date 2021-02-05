@@ -35,12 +35,6 @@ sources = files('''
         sd-dhcp6-lease.c
         dhcp-identifier.h
         dhcp-identifier.c
-        lldp-internal.h
-        lldp-network.h
-        lldp-network.c
-        lldp-neighbor.h
-        lldp-neighbor.c
-        sd-lldp.c
 '''.split())
 
 libsystemd_network = static_library(
@@ -94,10 +88,6 @@ tests += [
         [['src/libsystemd-network/test-dhcp6-client.c'],
          [libshared,
           libsystemd_network]],
-
-        [['src/libsystemd-network/test-lldp.c'],
-         [libshared,
-          libsystemd_network]],
 ]
 
 fuzzers += [
@@ -108,10 +98,6 @@ fuzzers += [
         [['src/libsystemd-network/fuzz-dhcp-server.c'],
          [libsystemd_network,
           libshared]],
-
-        [['src/libsystemd-network/fuzz-lldp.c'],
-         [libshared,
-          libsystemd_network]],
 
         [['src/libsystemd-network/fuzz-ndisc-rs.c'],
          [libshared,

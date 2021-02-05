@@ -1721,6 +1721,8 @@ install_libudev_static = static_library(
 subdir('src/core')
 # systemd-journal-remote requires 'libjournal_core'
 subdir('src/journal')
+# libsystemd-network requires 'libsystemd-lldp'
+subdir('src/libsystemd-lldp')
 # systemd-networkd requires 'libsystemd_network'
 subdir('src/libsystemd-network')
 
@@ -3239,11 +3241,25 @@ if conf.get('ENABLE_NETWORKD') == 1
                 include_directories : network_includes,
                 link_with : [libnetworkd_core,
                              libsystemd_network,
+                             libsystemd_lldp,
                              networkd_link_with],
                 dependencies : [threads],
                 install_rpath : rootlibexecdir,
                 install : true,
                 install_dir : rootlibexecdir)
+
+        shared_library(
+                'systemd-lldp',
+                disable_mempool_c, #!
+                include_directories: libsystemd_includes, #!
+                version : '1',
+                link_args : ['-shared',
+                             '-Wl,--version-script=' + libsystemd_lldp_sym_path],
+                link_whole : [libsystemd_lldp],
+                link_with : [libsystemd_static],#libshared_static],
+                link_depends : libsystemd_lldp_sym,
+                install : true,
+                install_dir : rootlibdir)
 
         executable(
                 'systemd-networkd-wait-online',
@@ -3259,6 +3275,7 @@ if conf.get('ENABLE_NETWORKD') == 1
                 networkctl_sources,
                 include_directories : libsystemd_network_includes,
                 link_with : [libsystemd_network,
+                             libsystemd_lldp,
                              networkd_link_with],
                 install_rpath : rootlibexecdir,
                 install : true,
